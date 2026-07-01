@@ -1,505 +1,486 @@
-slides:Hệ Thống Công Phép Online 2026:leave_tracker_app_2026.html
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hệ Thống Quản Lý Công Phép Online 2026 - Tổng Công Ty Giấy Việt Nam</title>
-    <!-- Tailwind CSS -->
+    <title>Hệ Thống Công Phép Trực Tuyến 2026 - Tổng Công Ty Giấy Việt Nam</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700&display=swap" rel="stylesheet">
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- SheetJS (Thư viện xuất file Excel cấu trúc chuẩn) -->
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-    
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f1f5f9;
-        }
-        h1, h2, h3, h4 {
-            font-family: 'Montserrat', sans-serif;
-        }
-        .excel-grid th, .excel-grid td {
-            border: 1px solid #cbd5e1;
-            padding: 8px 12px;
-            text-align: center;
-            font-size: 13px;
-        }
-        .excel-grid th {
-            background-color: #f8fafc;
-            color: #1e293b;
-            font-weight: 600;
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
+        h1, h2, h3, h4 { font-family: 'Montserrat', sans-serif; }
+        .excel-grid th, .excel-grid td { border: 1px solid #cbd5e1; padding: 10px 8px; text-align: center; font-size: 13px; }
+        .excel-grid th { background-color: #f1f5f9; color: #1e293b; font-weight: 600; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
 
-    <!-- Top Navbar -->
-    <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-xl">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-20">
-                <div class="flex items-center gap-3">
-                    <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
-                        <i class="fa-solid fa-file-invoice-dollar text-emerald-300 text-2xl"></i>
-                    </div>
-                    <div>
-                        <span class="text-[10px] tracking-widest text-emerald-300 font-bold uppercase block">TỔNG CÔNG TY GIẤY VIỆT NAM</span>
-                        <h1 class="text-lg font-bold tracking-tight">Cổng Quản Lý Công Phép Online 2026</h1>
-                    </div>
+    <header class="bg-gradient-to-r from-emerald-800 to-teal-900 text-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-5 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-white/10 p-2.5 rounded-xl border border-white/20">
+                    <i class="fa-solid fa-cloud-sun text-emerald-400 text-2xl"></i>
                 </div>
-                <!-- Action Tools -->
-                <div class="flex items-center gap-2">
-                    <button onclick="exportToExcelWithFormulas()" class="bg-amber-500 hover:bg-amber-600 text-white font-semibold px-4 py-2.5 rounded-lg text-xs transition shadow-md flex items-center gap-2">
-                        <i class="fa-solid fa-file-excel"></i> Xuất Excel Công Thức Chuẩn
-                    </button>
+                <div>
+                    <span class="text-[10px] tracking-widest text-emerald-300 font-bold uppercase block">TỔNG CÔNG TY GIẤY VIỆT NAM</span>
+                    <h1 class="text-xl font-bold tracking-tight">Hệ Thống Quản Lý Công Phép Tự Động Hóa Trực Tuyến 2026</h1>
                 </div>
             </div>
+            <button onclick="exportToExcelWithFormulas()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-5 py-2.5 rounded-xl text-xs transition shadow-md flex items-center gap-2">
+                <i class="fa-solid fa-file-excel text-sm"></i> Xuất File Báo Cáo Định Dạng Gốc
+            </button>
         </div>
     </header>
 
-    <!-- Sub Navigation Menu -->
     <div class="bg-white border-b border-slate-200 shadow-sm sticky top-0 z-40">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex space-x-1 py-3 overflow-x-auto">
-                <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold transition bg-emerald-50 text-emerald-800 border-b-2 border-emerald-600">
-                    <i class="fa-solid fa-table-cells mr-2"></i>Bảng Tính Công Phép 2026
-                </button>
-                <button onclick="switchTab('tab-form')" id="btn-tab-form" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
-                    <i class="fa-solid fa-paper-plane mr-2"></i>Đăng Ký Nghỉ Phép
-                </button>
-                <button onclick="switchTab('tab-history')" id="btn-tab-history" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
-                    <i class="fa-solid fa-clock-rotate-left mr-2"></i>Lịch Sử Điền Đơn
-                </button>
-                <button onclick="switchTab('tab-config')" id="btn-tab-config" class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold text-slate-600 hover:text-slate-900 transition">
-                    <i class="fa-solid fa-circle-nodes mr-2 text-indigo-600"></i>Kết Nối Google Sheets Thực Tế
-                </button>
-            </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex space-x-1 py-3 overflow-x-auto">
+            <button onclick="switchTab('tab-dashboard')" id="btn-tab-dashboard" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold transition bg-emerald-600 text-white">
+                <i class="fa-solid fa-table mr-1.5"></i>Bảng Tính Công Phép Live
+            </button>
+            <button onclick="switchTab('tab-form')" id="btn-tab-form" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                <i class="fa-solid fa-id-card-clip mr-1.5"></i>Đăng Ký Đơn Nghỉ Phép
+            </button>
+            <button onclick="switchTab('tab-import')" id="btn-tab-import" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                <i class="fa-solid fa-upload mr-1.5 text-blue-600"></i>Nạp Dữ Liệu Nhân Sự Hàng Loạt
+            </button>
+            <button onclick="switchTab('tab-cloud')" id="btn-tab-cloud" class="tab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
+                <i class="fa-solid fa-link mr-1.5 text-indigo-600"></i>Cài Đặt Link Google Sheets
+            </button>
         </div>
     </div>
 
-    <!-- Main Content Space -->
-    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
         
-        <!-- Tab 1: Dashboard Bảng tính Excel -->
-        <div id="tab-dashboard" class="tab-content block space-y-6">
+        <div id="tab-dashboard" class="tab-content block space-y-4">
             <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6 pb-6 border-b border-slate-100">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 pb-4 border-b border-slate-100">
                     <div>
-                        <span class="text-xs font-bold text-emerald-600 uppercase tracking-widest">Bộ phận: Văn Phòng</span>
-                        <h2 class="text-xl font-bold text-slate-900 mt-1">BẢNG THEO DÕI CÔNG PHÉP NĂM 2026 (ONLINE LIVE)</h2>
-                        <p class="text-xs text-slate-500 mt-1">Hệ thống tự động gom dữ liệu từ Form để hiển thị lên bảng tổng hợp theo tháng.</p>
+                        <h2 class="text-base font-bold text-slate-900 uppercase">Bảng Theo Dõi Công Phép Năm 2026</h2>
+                        <p class="text-xs text-slate-500 mt-0.5">Dữ liệu từ đơn phép tự động tổng hợp vào các tháng tương ứng của từng nhân sự.</p>
                     </div>
-                    <div class="flex gap-2">
-                        <div class="bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-100 text-xs text-emerald-800 font-medium">
-                            Tổng nhân sự: <span id="dash-total-staff" class="font-bold">0</span>
-                        </div>
-                        <div class="bg-teal-50 px-3 py-1.5 rounded-lg border border-teal-100 text-xs text-teal-800 font-medium">
-                            Phép đã dùng: <span id="dash-total-leaves" class="font-bold">0</span>
-                        </div>
+                    <div class="flex gap-3 text-xs font-semibold">
+                        <div class="bg-slate-100 px-3 py-2 rounded-lg text-slate-700">Nhân sự: <span id="lbl-total-staff" class="font-bold text-teal-700">0</span></div>
+                        <div class="bg-emerald-50 px-3 py-2 rounded-lg text-emerald-800">Số ngày nghỉ: <span id="lbl-total-leaves" class="font-bold text-emerald-700">0</span></div>
                     </div>
                 </div>
 
-                <!-- Live Excel Sheet Grid -->
-                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-inner">
-                    <table class="w-full min-w-[1200px] border-collapse excel-grid">
+                <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-sm">
+                    <table class="w-full min-w-[1100px] border-collapse excel-grid">
                         <thead>
-                            <tr class="bg-slate-50 text-slate-700">
-                                <th rowspan="2" class="w-14">Số TT</th>
-                                <th rowspan="2" class="min-w-[220px] text-left">Họ và tên</th>
-                                <th colspan="12" class="bg-emerald-50 text-emerald-950 font-bold">NĂM 2026</th>
+                            <tr>
+                                <th rowspan="2" class="w-12">Số TT</th>
+                                <th rowspan="2" class="min-w-[200px] text-left px-4">Họ và tên</th>
+                                <th colspan="12" class="bg-teal-50 text-teal-950 font-bold text-xs">NĂM 2026</th>
                                 <th rowspan="2" class="w-36 bg-amber-50 text-amber-900 font-bold">Tổng số công đã nghỉ</th>
-                                <th rowspan="2" class="w-44 text-left">Ghi chú</th>
+                                <th rowspan="2" class="w-32 text-left px-4">Ghi chú</th>
                             </tr>
-                            <tr class="bg-slate-100/50 text-slate-600 text-xs">
-                                <th class="w-14">Tháng 1</th>
-                                <th class="w-14">Tháng 2</th>
-                                <th class="w-14">Tháng 3</th>
-                                <th class="w-14">Tháng 4</th>
-                                <th class="w-14">Tháng 5</th>
-                                <th class="w-14">Tháng 6</th>
-                                <th class="w-14">Tháng 7</th>
-                                <th class="w-14">Tháng 8</th>
-                                <th class="w-14">Tháng 9</th>
-                                <th class="w-14">Tháng 10</th>
-                                <th class="w-14">Tháng 11</th>
-                                <th class="w-14">Tháng 12</th>
+                            <tr class="bg-slate-50 text-slate-600 text-[11px]">
+                                <th>Tháng 1</th><th>Tháng 2</th><th>Tháng 3</th><th>Tháng 4</th><th>Tháng 5</th><th>Tháng 6</th>
+                                <th>Tháng 7</th><th>Tháng 8</th><th>Tháng 9</th><th>Tháng 10</th><th>Tháng 11</th><th>Tháng 12</th>
                             </tr>
                         </thead>
-                        <tbody id="live-excel-body" class="divide-y divide-slate-200">
-                            <!-- Populate dynamically -->
+                        <tbody id="excel-grid-body" class="divide-y divide-slate-200 bg-white">
+                            <tr><td colspan="16" class="p-8 text-center text-slate-400 italic">Vui lòng qua tab "Nạp Dữ Liệu" hoặc "Cài Đặt Link Google Sheets" để đồng bộ danh sách.</td></tr>
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- Tab 2: Leave Form Submission -->
-        <div id="tab-form" class="tab-content hidden max-w-xl mx-auto">
-            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 overflow-hidden">
-                <div class="bg-gradient-to-r from-emerald-700 to-teal-800 text-white px-6 py-5">
-                    <h3 class="font-bold text-lg flex items-center gap-2"><i class="fa-solid fa-paper-plane text-emerald-300"></i> Phiếu Đăng Ký Nghỉ Phép Trực Tuyến</h3>
-                    <p class="text-xs text-emerald-100 mt-1">Thông tin sau khi gửi sẽ được cập nhật tự động vào hệ thống.</p>
+        <div id="tab-form" class="tab-content hidden max-w-lg mx-auto">
+            <div class="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden">
+                <div class="bg-gradient-to-r from-teal-700 to-emerald-800 text-white px-6 py-4 flex justify-between items-center">
+                    <h3 class="font-bold text-sm uppercase tracking-wide"><i class="fa-solid fa-paper-plane text-emerald-300 mr-2"></i>Phiếu Đăng Ký Nghỉ Phép Trực Tuyến</h3>
+                    <span id="sync-status" class="text-[10px] bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-300">Sẵn sàng</span>
                 </div>
-                
-                <form id="leave-form" onsubmit="submitForm(event)" class="p-6 space-y-5">
+                <form id="leave-registration-form" onsubmit="saveLeaveForm(event)" class="p-6 space-y-4">
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Họ và tên nhân viên <span class="text-red-500">*</span></label>
-                        <select id="form-employee" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm">
-                            <option value="" disabled selected>-- Chọn họ tên nhân viên --</option>
-                            <option value="Nguyễn Minh Ngọc">Nguyễn Minh Ngọc</option>
-                            <option value="Nguyễn Văn Nam">Nguyễn Văn Nam</option>
-                            <option value="Nguyễn T Tuyết Nhung">Nguyễn T Tuyết Nhung</option>
-                            <option value="Lê Việt Anh">Lê Việt Anh</option>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Chọn Nhân Viên <span class="text-red-500">*</span></label>
+                        <select id="leave-select-name" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 outline-none text-sm bg-slate-50">
+                            <option value="" disabled selected>-- Chọn họ và tên nhân viên --</option>
                         </select>
                     </div>
-
                     <div class="grid grid-cols-2 gap-4">
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Nghỉ từ ngày <span class="text-red-500">*</span></label>
-                            <input type="date" id="form-start-date" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Từ Ngày <span class="text-red-500">*</span></label>
+                            <input type="date" id="leave-start-date" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
                         </div>
                         <div>
-                            <label class="block text-sm font-semibold text-slate-700 mb-1.5">Đến hết ngày <span class="text-red-500">*</span></label>
-                            <input type="date" id="form-end-date" required class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm">
+                            <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Đến Ngày <span class="text-red-500">*</span></label>
+                            <input type="date" id="leave-end-date" required class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
                         </div>
                     </div>
-
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Số ngày xin nghỉ <span class="text-red-500">*</span></label>
-                        <input type="number" id="form-days" step="0.1" min="0.1" max="30" placeholder="Ví dụ: 1 hoặc 0.5" required class="w-full px-3 py-2.5 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm">
-                        <span class="text-[11px] text-slate-400 block mt-1">Nghỉ nửa ngày điền 0.5, nghỉ 1 ngày điền 1.</span>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Số Ngày Nghỉ Thực Tế <span class="text-red-500">*</span></label>
+                        <input type="number" id="leave-days" step="0.1" min="0.1" placeholder="Ví dụ: 1 hoặc 0.5" required class="w-full px-3 py-2.5 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm">
                     </div>
-
                     <div>
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Lý do nghỉ / Ghi chú</label>
-                        <textarea id="form-reason" placeholder="Ví dụ: Việc cá nhân, Đi khám sức khỏe..." rows="3" class="w-full px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 outline-none transition text-sm"></textarea>
+                        <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lý do nghỉ / Ghi chú</label>
+                        <textarea id="leave-reason" placeholder="Lý do xin nghỉ..." rows="2" class="w-full px-3 py-2 rounded-xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 text-sm"></textarea>
                     </div>
-
-                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-3 px-4 rounded-xl shadow-md transition transform active:scale-95 flex items-center justify-center gap-2">
-                        <i class="fa-solid fa-cloud-arrow-up"></i> Gửi Yêu Cầu Nghỉ Phép
+                    <button type="submit" id="btn-submit-form" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 px-4 rounded-xl shadow transition text-xs uppercase tracking-wider flex justify-center items-center gap-2">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Gửi và Đồng Bộ Lên Google Sheets
                     </button>
                 </form>
             </div>
         </div>
 
-        <!-- Tab 3: History logs -->
-        <div id="tab-history" class="tab-content hidden space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6">
-                <div class="flex justify-between items-center mb-6">
+        <div id="tab-import" class="tab-content hidden space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-fit space-y-4">
                     <div>
-                        <h2 class="text-xl font-bold text-slate-900">Nhật Ký Đăng Ký Gần Đây</h2>
-                        <p class="text-xs text-slate-500 mt-1">Danh sách tổng hợp các đơn phép đã được gửi thành công lên hệ thống.</p>
+                        <h3 class="font-bold text-xs uppercase text-slate-700 mb-2"><i class="fa-solid fa-file-csv text-teal-600 mr-1.5"></i>Nạp File Excel Danh Sách</h3>
+                        <p class="text-[11px] text-slate-400 mb-3">Hệ thống tự động lọc và nhận diện cột Họ tên từ tệp danh sách của bạn để ghi nhận.</p>
+                        <input type="file" id="excel-file-input" accept=".xlsx, .xls, .csv" onchange="parseExcelRoster(event)" class="hidden">
+                        <label for="excel-file-input" class="w-full border-2 border-dashed border-slate-300 bg-slate-50 hover:bg-slate-100 p-5 rounded-xl flex flex-col items-center justify-center cursor-pointer text-center transition">
+                            <i class="fa-solid fa-file-import text-teal-600 text-2xl mb-1"></i>
+                            <span class="text-xs font-bold text-slate-700">Chọn file danh sách từ máy tính</span>
+                        </label>
+                    </div>
+                    <div class="pt-4 border-t border-slate-100">
+                        <h3 class="font-bold text-xs uppercase text-slate-700 mb-2">Thêm Nhân Sự Thủ Công</h3>
+                        <div class="flex gap-2">
+                            <input type="text" id="manual-name-input" placeholder="Nhập họ tên..." class="flex-grow px-3 py-2 border border-slate-300 rounded-xl text-xs outline-none focus:ring-2 focus:ring-teal-500">
+                            <button onclick="addSingleStaff()" class="bg-teal-600 hover:bg-teal-700 text-white font-bold px-3 py-2 rounded-xl text-xs">Thêm</button>
+                        </div>
                     </div>
                 </div>
 
-                <div class="overflow-x-auto rounded-xl border border-slate-200">
-                    <table class="w-full text-left border-collapse text-sm">
-                        <thead>
-                            <tr class="bg-slate-50 border-b border-slate-200 text-slate-600 font-bold">
-                                <th class="p-4">Nhân viên</th>
-                                <th class="p-4">Thời gian nghỉ</th>
-                                <th class="p-4 text-center">Số ngày</th>
-                                <th class="p-4">Lý do nghỉ</th>
-                                <th class="p-4">Đồng bộ đám mây</th>
-                                <th class="p-4 text-center">Xóa dòng</th>
-                            </tr>
-                        </thead>
-                        <tbody id="history-table-body" class="divide-y divide-slate-100">
-                            <!-- Dynamic rendering -->
-                        </tbody>
-                    </table>
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 md:col-span-2 space-y-3">
+                    <div class="flex justify-between items-center">
+                        <h3 class="font-bold text-xs uppercase text-slate-700"><i class="fa-solid fa-users text-slate-500 mr-1.5"></i>Danh sách nhân viên hiện tại</h3>
+                        <button onclick="wipeDatabase()" class="text-red-500 hover:text-red-700 text-xs font-bold"><i class="fa-solid fa-trash-can mr-1"></i>Xóa sạch dữ liệu</button>
+                    </div>
+                    <div class="max-h-[350px] overflow-y-auto rounded-xl border border-slate-200">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-slate-50 text-slate-600 uppercase font-bold sticky top-0 border-b border-slate-200">
+                                <tr>
+                                    <th class="p-3 w-16 text-center">STT</th>
+                                    <th class="p-3">Họ và tên</th>
+                                    <th class="p-3 text-center w-20">Xóa</th>
+                                </tr>
+                            </thead>
+                            <tbody id="roster-table-body" class="bg-white divide-y divide-slate-100">
+                                </tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Tab 4: Google Sheets Real Database Integration Guide -->
-        <div id="tab-config" class="tab-content hidden max-w-3xl mx-auto space-y-6">
-            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
-                <div class="border-b border-slate-100 pb-4">
-                    <h3 class="font-bold text-lg text-indigo-950 flex items-center gap-2">
-                        <i class="fa-solid fa-circle-nodes text-indigo-600"></i>Kết Nối Google Sheets Online Thực Tế
+        <div id="tab-cloud" class="tab-content hidden max-w-2xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-4">
+                <div class="border-b border-slate-100 pb-3">
+                    <h3 class="font-bold text-base text-slate-900 flex items-center gap-2">
+                        <i class="fa-brands fa-google-drive text-indigo-600"></i>Cấu Hình Link Máy Chủ Google Sheets Trực Tuyến
                     </h3>
-                    <p class="text-xs text-slate-500 mt-1">
-                        Mặc định trang web lưu trữ dữ liệu trên trình duyệt của riêng bạn. Nếu muốn đồng bộ để nhiều người điền cùng lúc về 1 file Google Sheets duy nhất, hãy làm theo hướng dẫn dưới đây.
-                    </p>
+                    <p class="text-xs text-slate-500 mt-0.5">Nhập liên kết Web App thu được từ Google Apps Script để kích hoạt tính năng đồng bộ trực tuyến đa nền tảng.</p>
                 </div>
 
-                <div class="space-y-4">
-                    <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 flex gap-3 text-sm text-amber-900">
-                        <i class="fa-solid fa-circle-info text-amber-600 text-lg mt-0.5"></i>
-                        <div>
-                            <strong class="block mb-1">Mẹo nâng cao cho Quản trị viên:</strong>
-                            Dưới đây là đoạn mã Google Apps Script giúp kết nối Form của HTML này trực tiếp với tệp Google Sheets trực tuyến của bạn để nhận dữ liệu thời gian thực miễn phí.
-                        </div>
+                <div class="space-y-1.5">
+                    <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Dán liên kết Web App của bạn vào đây:</label>
+                    <div class="flex gap-2">
+                        <input type="url" id="cloud-webhook-url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-grow px-3 py-2.5 border border-slate-300 rounded-xl text-xs font-mono outline-none focus:ring-2 focus:ring-indigo-500">
+                        <button onclick="saveCloudConfiguration()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2 rounded-xl text-xs transition">Lưu & Kết Nối</button>
                     </div>
-
-                    <div class="space-y-3">
-                        <h4 class="font-bold text-slate-800 text-sm">Mã lập trình Google Apps Script (Copy dán vào Tiện ích mở rộng Google Sheets):</h4>
-                        <pre class="bg-slate-950 text-emerald-400 p-4 rounded-xl text-xs overflow-x-auto font-mono max-h-48">
-function doPost(e) {
-  var sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Du_Lieu_Form");
-  if (!sheet) {
-    sheet = SpreadsheetApp.getActiveSpreadsheet().insertSheet("Du_Lieu_Form");
-    sheet.appendRow(["Dấu thời gian", "Họ và tên", "Bộ phận", "Ngày bắt đầu", "Ngày kết thúc", "Số ngày nghỉ", "Lý do"]);
-  }
-  var data = JSON.parse(e.postData.contents);
-  sheet.appendRow([new Date(), data.name, "Văn Phòng", data.startDate, data.endDate, data.days, data.reason]);
-  return ContentService.createTextOutput(JSON.stringify({"status": "success"})).setMimeType(ContentService.MimeType.JSON);
-}</pre>
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100">
-                        <label class="block text-sm font-semibold text-slate-700 mb-1.5">Địa chỉ Web App URL của Google Sheets (Sau khi Deploy):</label>
-                        <div class="flex gap-2">
-                            <input type="url" id="sheet-webhook-url" placeholder="https://script.google.com/macros/s/.../exec" class="flex-grow px-3 py-2 rounded-lg border border-slate-300 focus:ring-2 focus:ring-indigo-500 text-xs outline-none font-mono">
-                            <button onclick="saveWebhookUrl()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold px-4 py-2 rounded-lg text-xs transition">
-                                Lưu Kết Nối
-                            </button>
-                        </div>
-                        <p class="text-[11px] text-slate-400 mt-1">Khi dán link Apps Script vào đây, đơn phép gửi đi sẽ tự động bắn thẳng về file Google Sheets của bạn!</p>
-                    </div>
+                </div>
+                
+                <div class="bg-slate-50 border border-slate-200 rounded-xl p-4 text-xs space-y-2">
+                    <strong class="text-slate-900 block"><i class="fa-solid fa-circle-question mr-1 text-teal-600"></i> Làm thế nào để lấy được đường link này?</strong>
+                    <p class="text-slate-600">Vui lòng làm theo đúng thứ tự các bước hướng dẫn cụ thể được ghi ở **Phần 2** trong phần phản hồi của AI.</p>
                 </div>
             </div>
         </div>
 
     </main>
 
-    <!-- Success Feedback Toasts -->
-    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-20 opacity-0 bg-slate-900 text-white px-5 py-3.5 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300 z-50 text-sm">
-        <i class="fa-solid fa-circle-check text-emerald-500 text-lg" id="toast-icon"></i>
-        <span id="toast-message" class="font-medium">Hệ thống đã cập nhật số liệu mới!</span>
+    <div id="toast" class="fixed bottom-6 right-6 transform translate-y-24 opacity-0 bg-slate-900 text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-2 transition-all duration-300 z-50 text-xs font-semibold">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400 text-base"></i>
+        <span id="toast-msg">Đã lưu cập nhật!</span>
     </div>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-center mt-auto">
-        <p class="text-xs">© 2026 TỔNG CÔNG TY GIẤY VIỆT NAM - BỘ PHẬN VĂN PHÒNG</p>
-        <p class="text-[10px] text-slate-500 mt-1">Báo cáo trực quan kết hợp xuất cấu trúc Excel phức tạp tự động hóa.</p>
-    </footer>
-
-    <!-- System Business Engine (Javascript) -->
     <script>
-        const employees = [
-            { name: "Nguyễn Minh Ngọc", note: "Bình thường" },
-            { name: "Nguyễn Văn Nam", note: "Bình thường" },
-            { name: "Nguyễn T Tuyết Nhung", note: "Bình thường" },
-            { name: "Lê Việt Anh", note: "Bình thường" }
-        ];
-
-        // Seed data matching Sheet3 of "Bảng theo dõi công phép năm 2026.xlsx" exactly
-        const defaultLeaves = [
-            { id: 1, name: "Nguyễn Minh Ngọc", startDate: "2026-01-10", endDate: "2026-01-10", days: 1, reason: "Giải quyết việc cá nhân" },
-            { id: 2, name: "Nguyễn Minh Ngọc", startDate: "2026-01-15", endDate: "2026-01-15", days: 1, reason: "Đi khám bệnh định kỳ" },
-            { id: 3, name: "Nguyễn Văn Nam", startDate: "2026-02-20", endDate: "2026-02-20", days: 0.5, reason: "Nghỉ nửa ngày buổi chiều" },
-            { id: 4, name: "Nguyễn T Tuyết Nhung", startDate: "2026-05-12", endDate: "2026-05-14", days: 3, reason: "Nghỉ mát cùng gia đình" },
-            { id: 5, name: "Lê Việt Anh", startDate: "2026-12-25", endDate: "2026-12-25", days: 1, reason: "Nghỉ việc gia đình" }
-        ];
-
+        let employees = [];
         let leaves = [];
-        let webhookUrl = "";
+        let cloudUrl = "";
 
-        // Load database on startup
-        function initApp() {
-            const cachedLeaves = localStorage.getItem('leave_tracker_shared_db');
-            webhookUrl = localStorage.getItem('leave_tracker_webhook_url') || "";
-            document.getElementById('sheet-webhook-url').value = webhookUrl;
+        window.onload = function() {
+            const cachedStaff = localStorage.getItem('global_roster_2026');
+            const cachedLeaves = localStorage.getItem('global_leaves_2026');
+            cloudUrl = localStorage.getItem('global_cloud_url_2026') || "";
+            
+            document.getElementById('cloud-webhook-url').value = cloudUrl;
 
-            if (cachedLeaves) {
-                leaves = JSON.parse(cachedLeaves);
-            } else {
-                leaves = [...defaultLeaves];
-                localStorage.setItem('leave_tracker_shared_db', JSON.stringify(leaves));
-            }
+            if (cachedStaff) { employees = JSON.parse(cachedStaff); }
+            if (cachedLeaves) { leaves = JSON.parse(cachedLeaves); }
 
-            renderAll();
+            refreshAllUI();
+        };
+
+        function refreshAllUI() {
+            renderDashboardGrid();
+            populateFormDropdown();
+            renderRosterPanelTable();
         }
 
-        function saveWebhookUrl() {
-            const urlInput = document.getElementById('sheet-webhook-url').value.trim();
-            localStorage.setItem('leave_tracker_webhook_url', urlInput);
-            webhookUrl = urlInput;
-            showToast("Đã lưu URL kết nối Google Sheets thành công!", "fa-solid fa-circle-check", "text-emerald-500");
-        }
-
-        // Routing Tab View
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('bg-emerald-50', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
-                btn.classList.add('text-slate-600', 'hover:text-slate-900');
+                btn.classList.remove('bg-emerald-600', 'text-white');
+                btn.classList.add('text-slate-600', 'hover:bg-slate-100');
             });
 
             document.getElementById(tabId).classList.remove('hidden');
-            const activeBtn = document.getElementById('btn-' + tabId);
-            activeBtn.classList.add('bg-emerald-50', 'text-emerald-800', 'border-b-2', 'border-emerald-600');
-            activeBtn.classList.remove('text-slate-600', 'hover:text-slate-900');
+            const currentBtn = document.getElementById('btn-' + tabId);
+            currentBtn.classList.add('bg-emerald-600', 'text-white');
+            currentBtn.classList.remove('text-slate-600', 'hover:bg-slate-100');
         }
 
-        function formatDisplayDate(dateStr) {
-            if (!dateStr) return '';
-            const parts = dateStr.split('-');
-            if (parts.length === 3) return `${parts[2]}/${parts[1]}/${parts[0]}`;
-            return dateStr;
-        }
-
-        // Render functions
-        function renderAll() {
-            renderDashboard();
-            renderHistory();
-        }
-
-        function renderDashboard() {
-            const body = document.getElementById('live-excel-body');
+        function renderDashboardGrid() {
+            const body = document.getElementById('excel-grid-body');
             body.innerHTML = '';
-            
-            let totalLeaves = 0;
-            document.getElementById('dash-total-staff').textContent = employees.length;
+            document.getElementById('lbl-total-staff').textContent = employees.length;
 
-            employees.forEach((emp, index) => {
+            let globalLeavesSum = 0;
+
+            if (employees.length === 0) {
+                body.innerHTML = `<tr><td colspan="16" class="p-8 text-center text-slate-400 italic">Danh sách đang trống. Vui lòng nạp dữ liệu nhân sự để bắt đầu.</td></tr>`;
+                document.getElementById('lbl-total-leaves').textContent = "0 ngày";
+                return;
+            }
+
+            employees.forEach((name, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition-colors";
+                tr.className = "hover:bg-slate-50 transition-colors";
                 
-                let staffSum = 0;
-                let rowHtml = `
-                    <td class="bg-slate-100 font-semibold text-slate-600">${index + 1}</td>
-                    <td class="text-left font-bold text-slate-800 bg-white shadow-sm">${emp.name}</td>
+                let employeeTotalRowSum = 0;
+                let cellsHtml = `
+                    <td class="bg-slate-50 font-medium text-slate-500">${idx + 1}</td>
+                    <td class="text-left font-semibold text-slate-800 px-4">${name}</td>
                 `;
 
-                // Calculate sum monthly
                 for (let m = 1; m <= 12; m++) {
-                    let monthTotal = 0;
+                    let monthLeavesAccumulator = 0;
                     leaves.forEach(l => {
-                        if (l.name === emp.name) {
-                            const dateObj = new Date(l.startDate);
-                            const month = dateObj.getMonth() + 1;
-                            const year = dateObj.getFullYear();
-                            if (month === m && year === 2026) {
-                                monthTotal += l.days;
+                        if (l.name === name) {
+                            const d = new Date(l.start);
+                            if (d.getFullYear() === 2026 && (d.getMonth() + 1) === m) {
+                                monthLeavesAccumulator += l.days;
                             }
                         }
                     });
 
-                    staffSum += monthTotal;
-                    totalLeaves += monthTotal;
-                    
-                    const cellVal = monthTotal > 0 ? monthTotal : "";
-                    const activeCellClass = monthTotal > 0 ? "bg-emerald-50/60 font-bold text-emerald-700" : "";
-                    rowHtml += `<td class="${activeCellClass}">${cellVal}</td>`;
+                    employeeTotalRowSum += monthLeavesAccumulator;
+                    globalLeavesSum += monthLeavesAccumulator;
+
+                    const cellVal = monthLeavesAccumulator > 0 ? monthLeavesAccumulator : "";
+                    const activeStyle = monthLeavesAccumulator > 0 ? "bg-emerald-50/70 font-bold text-emerald-700" : "";
+                    cellsHtml += `<td class="${activeStyle}">${cellVal}</td>`;
                 }
 
-                rowHtml += `
-                    <td class="bg-amber-50 font-bold text-amber-700">${staffSum > 0 ? staffSum : ""}</td>
-                    <td class="text-left text-xs text-slate-500 italic max-w-[150px] truncate" title="${emp.note}">${emp.note}</td>
+                cellsHtml += `
+                    <td class="bg-amber-50/60 font-bold text-amber-800">${employeeTotalRowSum > 0 ? employeeTotalRowSum : 0}</td>
+                    <td class="text-left px-4 text-[11px] text-slate-400 italic">Trực tuyến</td>
                 `;
-                
-                tr.innerHTML = rowHtml;
+
+                tr.innerHTML = cellsHtml;
                 body.appendChild(tr);
             });
 
-            document.getElementById('dash-total-leaves').textContent = totalLeaves + " ngày";
+            document.getElementById('lbl-total-leaves').textContent = globalLeavesSum + " ngày";
         }
 
-        function renderHistory() {
-            const body = document.getElementById('history-table-body');
+        function populateFormDropdown() {
+            const select = document.getElementById('leave-select-name');
+            select.innerHTML = '<option value="" disabled selected>-- Chọn họ và tên nhân viên --</option>';
+            employees.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = name; opt.textContent = name;
+                select.appendChild(opt);
+            });
+        }
+
+        function renderRosterPanelTable() {
+            const body = document.getElementById('roster-table-body');
             body.innerHTML = '';
 
-            if (leaves.length === 0) {
-                body.innerHTML = `<tr><td colspan="6" class="p-8 text-center text-slate-400">Chưa có yêu cầu nghỉ phép nào.</td></tr>`;
+            if (employees.length === 0) {
+                body.innerHTML = `<tr><td colspan="3" class="p-6 text-center text-slate-400 italic">Chưa có nhân sự nào trong danh sách.</td></tr>`;
                 return;
             }
 
-            leaves.forEach(l => {
+            employees.forEach((name, idx) => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition";
                 tr.innerHTML = `
-                    <td class="p-4 font-semibold text-slate-800">${l.name}</td>
-                    <td class="p-4 text-slate-600 text-xs">${formatDisplayDate(l.startDate)} &rarr; ${formatDisplayDate(l.endDate)}</td>
-                    <td class="p-4 text-center font-bold text-slate-900 bg-slate-50/50">${l.days}</td>
-                    <td class="p-4 text-slate-500 text-xs max-w-[200px] truncate" title="${l.reason}">${l.reason || "Không ghi chú"}</td>
-                    <td class="p-4"><span class="bg-emerald-100 text-emerald-800 text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-wider shadow-sm"><i class="fa-solid fa-cloud-arrow-up"></i> Live Cloud</span></td>
-                    <td class="p-4 text-center">
-                        <button onclick="deleteLeave(${l.id})" class="text-red-500 hover:text-red-700 p-1.5 transition rounded-lg hover:bg-red-50">
-                            <i class="fa-solid fa-trash-can"></i>
-                        </button>
+                    <td class="p-3 text-center text-slate-500 font-medium">${idx + 1}</td>
+                    <td class="p-3 font-semibold text-slate-700">${name}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="removeSingleStaff(${idx})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-solid fa-user-minus"></i></button>
                     </td>
                 `;
                 body.appendChild(tr);
             });
         }
 
-        // Action Handlers
-        function submitForm(e) {
+        function addSingleStaff() {
+            const input = document.getElementById('manual-name-input');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (employees.includes(name)) {
+                triggerToast("Tên nhân sự này đã tồn tại!", "fa-solid fa-triangle-exclamation", "text-amber-400");
+                return;
+            }
+
+            employees.push(name);
+            localStorage.setItem('global_roster_2026', JSON.stringify(employees));
+            input.value = '';
+            refreshAllUI();
+            triggerToast("Đã thêm nhân sự thành công!", "fa-solid fa-circle-check", "text-emerald-400");
+        }
+
+        function removeSingleStaff(idx) {
+            if (confirm(`Xóa nhân viên "${employees[idx]}" khỏi hệ thống?`)) {
+                employees.splice(idx, 1);
+                localStorage.setItem('global_roster_2026', JSON.stringify(employees));
+                refreshAllUI();
+                triggerToast("Đã loại bỏ nhân sự.", "fa-solid fa-trash-can", "text-rose-400");
+            }
+        }
+
+        function wipeDatabase() {
+            if (confirm("Bạn có chắc chắn muốn xóa sạch toàn bộ cấu hình nhân sự và ngày nghỉ?")) {
+                employees = []; leaves = [];
+                localStorage.removeItem('global_roster_2026');
+                localStorage.removeItem('global_leaves_2026');
+                refreshAllUI();
+                triggerToast("Hệ thống dữ liệu đã được xóa trống.", "fa-solid fa-dumpster", "text-red-400");
+            }
+        }
+
+        function saveLeaveForm(e) {
             e.preventDefault();
-            const name = document.getElementById('form-employee').value;
-            const startDate = document.getElementById('form-start-date').value;
-            const endDate = document.getElementById('form-end-date').value;
-            const days = parseFloat(document.getElementById('form-days').value);
-            const reason = document.getElementById('form-reason').value;
+            const btn = document.getElementById('btn-submit-form');
+            const statusLabel = document.getElementById('sync-status');
+            
+            const name = document.getElementById('leave-select-name').value;
+            const start = document.getElementById('leave-start-date').value;
+            const end = document.getElementById('leave-end-date').value;
+            const days = parseFloat(document.getElementById('leave-days').value);
+            const reason = document.getElementById('leave-reason').value;
 
-            const newLeave = {
-                id: Date.now(),
-                name,
-                startDate,
-                endDate,
-                days,
-                reason
-            };
+            const packageData = { name, start, end, days, reason };
 
-            // 1. Post to cloud database if Webhook is active
-            if (webhookUrl) {
-                fetch(webhookUrl, {
+            btn.disabled = true;
+            btn.innerHTML = `<i class="fa-solid fa-spinner animate-spin"></i> Đang đồng bộ đám mây...`;
+            statusLabel.textContent = "Đang gửi...";
+            statusLabel.className = "text-[10px] bg-amber-900/60 px-2 py-0.5 rounded border border-amber-500/30 text-amber-300";
+
+            // Save locally immediately
+            leaves.push(packageData);
+            localStorage.setItem('global_leaves_2026', JSON.stringify(leaves));
+
+            if (cloudUrl) {
+                // Submit to Google Sheets Server via Webhook API
+                fetch(cloudUrl, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(newLeave)
-                }).then(() => {
-                    console.log("Sync success!");
-                }).catch(err => console.error("Sync error:", err));
+                    body: JSON.stringify(packageData)
+                })
+                .then(() => {
+                    completeSubmission(name, "Đồng bộ thành công");
+                })
+                .catch(err => {
+                    console.error("Cloud Error:", err);
+                    completeSubmission(name, "Lưu cục bộ (Lỗi Cloud)");
+                });
+            } else {
+                setTimeout(() => {
+                    completeSubmission(name, "Đã lưu (Chưa nối Cloud)");
+                }, 500);
             }
+        }
 
-            // 2. Save locally
-            leaves.unshift(newLeave);
-            localStorage.setItem('leave_tracker_shared_db', JSON.stringify(leaves));
+        function completeSubmission(name, statusMessage) {
+            const btn = document.getElementById('btn-submit-form');
+            const statusLabel = document.getElementById('sync-status');
             
-            renderAll();
-            showToast(`Gửi thành công! Dữ liệu của ${name} đã được cập nhật.`, "fa-solid fa-circle-check", "text-emerald-500");
-            
-            document.getElementById('leave-form').reset();
+            btn.disabled = false;
+            btn.innerHTML = `<i class="fa-solid fa-cloud-arrow-up"></i> Gửi và Đồng Bộ Lên Google Sheets`;
+            statusLabel.textContent = "Sẵn sàng";
+            statusLabel.className = "text-[10px] bg-emerald-900/60 px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-300";
+
+            refreshAllUI();
+            triggerToast(`Đã lưu đơn phép cho ${name} (${statusMessage})!`, "fa-solid fa-circle-check", "text-emerald-400");
+            document.getElementById('leave-registration-form').reset();
             switchTab('tab-dashboard');
         }
 
-        function deleteLeave(id) {
-            if (confirm("Bạn có chắc chắn muốn xóa yêu cầu nghỉ phép này?")) {
-                leaves = leaves.filter(l => l.id !== id);
-                localStorage.setItem('leave_tracker_shared_db', JSON.stringify(leaves));
-                renderAll();
-                showToast("Đã xóa yêu cầu thành công.", "fa-solid fa-trash-can", "text-rose-500");
-            }
+        function parseExcelRoster(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                const binaryData = evt.target.result;
+                const workbook = XLSX.read(binaryData, { type: 'binary' });
+                const targetSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const arrayRows = XLSX.utils.sheet_to_json(targetSheet, { header: 1 });
+
+                let freshlyImportedNames = [];
+                arrayRows.forEach(row => {
+                    if (row && row.length > 0) {
+                        for (let val of row) {
+                            if (val && typeof val === 'string' && val.trim().length > 3 && isNaN(val)) {
+                                let item = val.trim();
+                                if (!item.includes("Số TT") && !item.includes("Tháng") && !item.includes("NĂM") && !item.includes("CÔNG TY")) {
+                                    if (!freshlyImportedNames.includes(item) && item.split(" ").length >= 2) {
+                                        freshlyImportedNames.push(item);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                if (freshlyImportedNames.length > 0) {
+                    employees = freshlyImportedNames;
+                    localStorage.setItem('global_roster_2026', JSON.stringify(employees));
+                    refreshAllUI();
+                    triggerToast(`Thành công! Đã nạp ${freshlyImportedNames.length} nhân viên.`, "fa-solid fa-check", "text-blue-400");
+                    switchTab('tab-dashboard');
+                } else {
+                    triggerToast("Không định dạng được cột họ tên hợp lệ trong file!", "fa-solid fa-exclamation", "text-amber-500");
+                }
+            };
+            reader.readAsBinaryString(file);
         }
 
-        function showToast(message, iconClass, iconColorClass) {
+        function saveCloudConfiguration() {
+            const url = document.getElementById('cloud-webhook-url').value.trim();
+            localStorage.setItem('global_cloud_url_2026', url);
+            cloudUrl = url;
+            triggerToast("Đã kích hoạt cổng kết nối Google Sheets!", "fa-solid fa-link", "text-indigo-400");
+            switchTab('tab-form');
+        }
+
+        function triggerToast(msg, icon, colorClass) {
             const toast = document.getElementById('toast');
-            const msg = document.getElementById('toast-message');
-            const icon = document.getElementById('toast-icon');
-
-            msg.textContent = message;
-            icon.className = `${iconClass} ${iconColorClass} text-lg`;
-            
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            setTimeout(() => {
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 4000);
+            document.getElementById('toast-msg').textContent = msg;
+            document.getElementById('toast-icon').className = `${icon} ${colorClass} text-base`;
+            toast.classList.remove('translate-y-24', 'opacity-0');
+            setTimeout(() => { toast.classList.add('translate-y-24', 'opacity-0'); }, 3500);
         }
 
-        // HIGH FIDELITY EXCEL GENERATION - MATCHES ORIGINAL FORMATTING WITH EXCEL FORMULAS
         function exportToExcelWithFormulas() {
             const wb = XLSX.utils.book_new();
 
-            // Construct Summary structure
-            const summaryRows = [
+            const masterRows = [
                 ["TỔNG CÔNG TY GIẤY VIỆT NAM", "", "", "", "BẢNG THEO DÕI CÔNG PHÉP NĂM 2026"],
                 ["Bộ phận: Văn Phòng"],
                 [],
@@ -507,40 +488,25 @@ function doPost(e) {
                 ["", "", "Tháng 1", "Tháng 2", "Tháng 3", "Tháng 4", "Tháng 5", "Tháng 6", "Tháng 7", "Tháng 8", "Tháng 9", "Tháng 10", "Tháng 11", "Tháng 12", "", ""]
             ];
 
-            // Build dynamic employee rows
-            employees.forEach((emp, index) => {
-                const rowIdx = index + 1;
-                summaryRows.push([
-                    rowIdx,
-                    emp.name,
-                    "", "", "", "", "", "", "", "", "", "", "", "", 
-                    "", 
-                    "Bình thường"
-                ]);
+            employees.forEach((name, idx) => {
+                masterRows.push([idx + 1, name, "", "", "", "", "", "", "", "", "", "", "", "", "", "Trực tuyến"]);
             });
 
-            const ws = XLSX.utils.aoa_to_sheet(summaryRows);
+            const wsSummary = XLSX.utils.aoa_to_sheet(masterRows);
+            const dataAnchorIndex = 6;
 
-            // Set real formulas inside the cells
-            const startDataRow = 6;
-            employees.forEach((emp, idx) => {
-                const currentExcelRow = startDataRow + idx;
-                
-                // Monthly formulas looking up raw form values
+            employees.forEach((name, idx) => {
+                const targetExcelRow = dataAnchorIndex + idx;
                 for (let m = 1; m <= 12; m++) {
-                    const colLetter = String.fromCharCode(67 + (m - 1)); // C = Tháng 1, D = Tháng 2...
-                    const lastDay = m === 2 ? 28 : ([4, 6, 9, 11].includes(m) ? 30 : 31);
-                    
-                    const formula = `SUMIFS(Du_Lieu_Form!$F:$F, Du_Lieu_Form!$B:$B, $B${currentExcelRow}, Du_Lieu_Form!$D:$D, ">="&DATE(2026, ${m}, 1), Du_Lieu_Form!$D:$D, "<="&DATE(2026, ${m}, ${lastDay}))`;
-                    ws[`${colLetter}${currentExcelRow}`] = { t: 'f', f: formula };
+                    const columnChar = String.fromCharCode(67 + (m - 1));
+                    const edgeDay = m === 2 ? 28 : ([4, 6, 9, 11].includes(m) ? 30 : 31);
+                    const sumifsFormula = `SUMIFS(Du_Lieu_Form!$F:$F, Du_Lieu_Form!$B:$B, $B${targetExcelRow}, Du_Lieu_Form!$D:$D, ">="&DATE(2026, ${m}, 1), Du_Lieu_Form!$D:$D, "<="&DATE(2026, ${m}, ${edgeDay}))`;
+                    wsSummary[columnChar + targetExcelRow] = { t: 'f', f: sumifsFormula };
                 }
-
-                // Cumulative formula for Column O (Total days off)
-                ws[`O${currentExcelRow}`] = { t: 'f', f: `SUM(C${currentExcelRow}:N${currentExcelRow})` };
+                wsSummary["O" + targetExcelRow] = { t: 'f', f: `SUM(C${targetExcelRow}:N${targetExcelRow})` };
             });
 
-            // Layout structures: Merges mapping
-            ws['!merges'] = [
+            wsSummary['!merges'] = [
                 { s: { r: 0, c: 4 }, e: { r: 0, c: 13 } }, 
                 { s: { r: 3, c: 0 }, e: { r: 4, c: 0 } }, 
                 { s: { r: 3, c: 1 }, e: { r: 4, c: 1 } }, 
@@ -549,50 +515,25 @@ function doPost(e) {
                 { s: { r: 3, c: 15 }, e: { r: 4, c: 15 } }  
             ];
 
-            // Custom column sizes
-            ws['!cols'] = [
+            wsSummary['!cols'] = [
                 { wch: 8 }, { wch: 28 },
                 { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
                 { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 }, { wch: 11 },
                 { wch: 22 }, { wch: 20 }
             ];
 
-            XLSX.utils.book_append_sheet(wb, ws, "Bao_Cao_Tong_Hop_2026");
+            XLSX.utils.book_append_sheet(wb, wsSummary, "Bao_Cao_Tong_Hop_2026");
 
-            // --- Sheet 2: Raw data feed from Google Form ---
-            const formRows = [
-                ["Dấu thời gian", "Họ và tên", "Bộ phận", "Ngày bắt đầu nghỉ", "Ngày kết thúc nghỉ", "Số ngày xin nghỉ", "Lý do nghỉ / Ghi chú"]
-            ];
-
+            const inputFeedRows = [["Dấu thời gian", "Họ và tên", "Bộ phận", "Ngày bắt đầu nghỉ", "Ngày kết thúc nghỉ", "Số ngày xin nghỉ", "Lý do nghỉ / Ghi chú"]];
             leaves.forEach(l => {
-                formRows.push([
-                    new Date().toISOString().slice(0, 10) + " 08:30:00",
-                    l.name,
-                    "Văn Phòng",
-                    l.startDate,
-                    l.endDate,
-                    l.days,
-                    l.reason
-                ]);
+                inputFeedRows.push([new Date().toISOString().slice(0, 10) + " 08:30:00", l.name, "Văn Phòng", l.start, l.end, l.days, l.reason]);
             });
 
-            const wsForm = XLSX.utils.aoa_to_sheet(formRows);
-            wsForm['!cols'] = [
-                { wch: 20 }, { wch: 28 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 12 }, { wch: 35 }
-            ];
-
-            XLSX.utils.book_append_sheet(wb, wsForm, "Du_Lieu_Form");
-
-            // Execute file save
+            const wsFormFeed = XLSX.utils.aoa_to_sheet(inputFeedRows);
+            XLSX.utils.book_append_sheet(wb, wsFormFeed, "Du_Lieu_Form");
+            
             XLSX.writeFile(wb, "Bang_Theo_Doi_Cong_Phep_Nam_2026.xlsx");
-            showToast("Đã xuất file Excel công thức chuẩn hoàn tất!", "fa-solid fa-file-excel", "text-amber-500");
         }
-
-        // Initialize App
-        window.onload = initApp;
     </script>
 </body>
 </html>
-```eof
-
-Tôi đã thiết kế xong cổng thông tin quản lý công phép trực tuyến hoàn hảo nhất cho bạn. Bạn có thể lưu trữ tệp tin này hoặc chia sẻ nó để mọi người sử dụng. Nếu cần tinh chỉnh thêm bất kỳ chức năng nào khác, hãy cho tôi biết ngay nhé!
